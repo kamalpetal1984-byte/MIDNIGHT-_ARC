@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIDNIGHT ARC - Social Protocol</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emeraldGlow: '#00FF88',
+                        emeraldDark: '#003822',
+                        emeraldMid: '#008544',
+                        metallicVoid: '#090D12',
+                        cardBg: '#121820',
+                        cardBorder: '#1F2937'
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #090D12;
+            color: #E5E7EB;
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .emerald-glow-text {
+            color: #00FF88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.6), 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .emerald-glow-box {
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.25), inset 0 0 10px rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.4);
+        }
+
+        .emerald-btn {
+            background: linear-gradient(135deg, #008544 0%, #00FF88 100%);
+            color: #000;
+            font-weight: 700;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .emerald-btn:hover {
+            box-shadow: 0 0 25px rgba(0, 255, 136, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .story-ring {
+            background: linear-gradient(45deg, #00FF88, #003822, #00FF88);
+            padding: 2.5px;
+            animation: ringRotate 4s linear infinite;
+        }
+
+        @keyframes ringRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090D12;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #008544;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00FF88;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col md:flex-row overflow-hidden select-none">
+
+    <!-- DESKTOP SIDEBAR NAVIGATION -->
+    <aside class="hidden md:flex flex-col justify-between w-64 bg-cardBg border-r border-cardBorder p-5 z-20">
+        <div>
+            <!-- BRANDING -->
+            <div class="flex items-center gap-3 mb-8 cursor-pointer" onclick="switchTab('feed')">
+                <div class="w-12 h-12 rounded-lg bg-emeraldDark flex items-center justify-center border border-emeraldGlow emerald-glow-box">
+                    <i class="fa-solid fa-moon text-2xl text-emeraldGlow"></i>
+                </div>
+                <div>
+                    <h1 class="font-orbitron font-extrabold text-xl tracking-wider emerald-glow-text">MIDNIGHT ARC</h1>
+                    <p class="text-xs text-emerald-400 opacity-80 tracking-widest font-mono">SOCIAL PROTOCOL</p>
+                </div>
+            </div>
+
+            <!-- NAV LINKS -->
+            <nav class="space-y-3 font-orbitron">
+                <button onclick="switchTab('feed')" id="nav-feed" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl bg-emeraldDark/40 text-emeraldGlow border border-emeraldGlow/40 transition">
+                    <i class="fa-solid fa-newspaper text-lg"></i>
+                    <span class="font-semibold text-sm">Feed & Posts</span>
+                </button>
+
+                <button onclick="switchTab('status')" id="nav-status" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-gray-400 hover:text-emeraldGlow hover:bg-emeraldDark/20 transition">
+                    <i class="fa-solid fa-circle-notch text-lg"></i>
+                    <span class="font-semibold text-sm">Status / Stories</span>
+                </button>
+
+                <button onclick="switchTab('reels')" id="nav-reels" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-gray-400 hover:text-emeraldGlow hover:bg-emeraldDark/20 transition">
+                    <i class="fa-solid fa-clapperboard text-lg"></i>
+                    <span class="font-semibold text-sm">Reels</span>
+                </button>
+
+                <button onclick="switchTab('broadcast')" id="nav-broadcast" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-gray-400 hover:text-emeraldGlow hover:bg-emeraldDark/20 transition">
+                    <i class="fa-solid fa-tower-cell text-lg"></i>
+                    <span class="font-semibold text-sm">Global Broadcast</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- USER PROFILE BADGE -->
+        <div onclick="openProfileModal()" class="p-3 bg-metallicVoid rounded-xl border border-cardBorder flex items-center gap-3 cursor-pointer hover:border-emeraldGlow/50 transition">
+            <div id="sidebar-user-avatar" class="w-10 h-10 rounded-full bg-emeraldGlow/20 border border-emeraldGlow flex items-center justify-center font-bold text-emeraldGlow font-orbitron">
+                ?
+            </div>
+            <div class="overflow-hidden flex-1">
+                <p id="sidebar-user-name" class="font-bold text-sm text-gray-200 truncate">Set Profile</p>
+                <p id="sidebar-user-handle" class="text-xs text-emerald-400 font-mono">@username</p>
+            </div>
+            <i class="fa-solid fa-pen-to-square text-xs text-gray-400"></i>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 flex flex-col h-full bg-metallicVoid overflow-hidden relative">
+        
+        <!-- MOBILE HEADER -->
+        <header class="md:hidden flex items-center justify-between px-4 py-3 bg-cardBg border-b border-cardBorder z-20">
+            <div class="flex items-center gap-2" onclick="switchTab('feed')">
+                <i class="fa-solid fa-gem text-emeraldGlow text-xl"></i>
+                <h1 class="font-orbitron font-extrabold text-lg emerald-glow-text">EMERALD REIGN</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="openProfileModal()" class="text-emeraldGlow p-1">
+                    <i class="fa-solid fa-user-gear text-lg"></i>
+                </button>
+                <button onclick="switchTab('broadcast')" class="text-emeraldGlow p-1">
+                    <i class="fa-solid fa-tower-cell text-lg"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- SECTIONS WRAPPER -->
+        <div id="content-area" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 max-w-4xl mx-auto w-full pb-24 md:pb-6">
+            
+            <!-- SECTION 1: FEED & POSTS -->
+            <section id="section-feed" class="space-y-6">
+                
+                <!-- STORIES QUICK ROW -->
+                <div class="bg-cardBg border border-cardBorder rounded-2xl p-4">
+                    <h3 class="text-xs font-orbitron tracking-widest text-emerald-400 mb-3 uppercase">Active Stories</h3>
+                    <div id="stories-row" class="flex items-center gap-4 overflow-x-auto no-scrollbar pb-2">
+                        <!-- Add Status Button -->
+                        <div onclick="openStatusModal()" class="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0">
+                            <div class="w-14 h-14 rounded-full border-2 border-dashed border-emeraldGlow flex items-center justify-center bg-emeraldDark/30 text-emeraldGlow hover:scale-105 transition">
+                                <i class="fa-solid fa-plus text-lg"></i>
+                            </div>
+                            <span class="text-xs font-medium text-emerald-400">Add Story</span>
+                        </div>
+                        <!-- Dynamic Stories Inject Here -->
+                    </div>
+                </div>
+
+                <!-- CREATE POST BOX -->
+                <div class="bg-cardBg border border-cardBorder rounded-2xl p-4 emerald-glow-box">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div id="create-post-avatar" class="w-10 h-10 rounded-full bg-emeraldDark flex items-center justify-center border border-emeraldGlow font-orbitron font-bold text-emeraldGlow">
+                            ?
+                        </div>
+                        <input id="post-input-text" type="text" placeholder="What's on your mind?" class="w-full bg-metallicVoid text-sm text-gray-200 border border-cardBorder rounded-xl px-4 py-2.5 focus:outline-none focus:border-emeraldGlow transition">
+                    </div>
+                    
+                    <div id="image-url-preview" class="hidden mb-3 relative">
+                        <img id="preview-img-tag" src="" class="max-h-48 rounded-xl w-full object-cover border border-emeraldGlow/40">
+                        <button onclick="clearImagePreview()" class="absolute top-2 right-2 bg-black/70 text-white rounded-full p-1 w-7 h-7 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+
+                    <div class="flex items-center justify-between border-t border-cardBorder pt-3">
+                        <button onclick="promptImageUrl()" class="flex items-center gap-2 text-xs font-semibold text-emerald-400 hover:text-emeraldGlow transition px-3 py-1.5 rounded-lg bg-emeraldDark/30">
+                            <i class="fa-solid fa-image"></i> Add Photo URL
+                        </button>
+                        <button onclick="createPost()" class="emerald-btn font-orbitron px-5 py-2 rounded-xl text-xs uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Post
+                        </button>
+                    </div>
+                </div>
+
+                <!-- FEED POSTS LIST -->
+                <div id="posts-container" class="space-y-6">
+                    <!-- Dynamic Posts render here -->
+                </div>
+            </section>
+
+            <!-- SECTION 2: STATUS / STORIES -->
+            <section id="section-status" class="hidden space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="font-orbitron text-xl font-bold text-emeraldGlow">STATUS UPDATES</h2>
+                        <p class="text-xs text-gray-400">View and share temporary updates with everyone.</p>
+                    </div>
+                    <button onclick="openStatusModal()" class="emerald-btn px-4 py-2 rounded-xl text-xs font-orbitron uppercase">
+                        + New Status
+                    </button>
+                </div>
+
+                <div id="status-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Status cards injected dynamically -->
+                </div>
+            </section>
+
+            <!-- SECTION 3: REELS -->
+            <section id="section-reels" class="hidden space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="font-orbitron text-xl font-bold text-emeraldGlow">MIDNIGHT REELS</h2>
+                        <p class="text-xs text-gray-400">Share short clips or photos with likes and comments.</p>
+                    </div>
+                    <button onclick="openReelModal()" class="emerald-btn px-4 py-2 rounded-xl text-xs font-orbitron uppercase">
+                        + Create Reel
+                    </button>
+                </div>
+
+                <div id="reels-main-view" class="h-[calc(100vh-220px)] md:h-[calc(100vh-180px)] flex justify-center items-center">
+                    <div id="reel-card-empty" class="hidden text-center text-gray-400 font-orbitron text-sm p-8 bg-cardBg border border-cardBorder rounded-2xl">
+                        No Reels posted yet. Click "+ Create Reel" to publish the first one!
+                    </div>
+
+                    <div id="reel-card-player" class="relative w-full max-w-md h-full bg-black rounded-2xl border border-emeraldGlow/50 overflow-hidden flex flex-col justify-between shadow-2xl">
+                        <!-- Reel Content Display -->
+                        <div id="reel-display-area" class="absolute inset-0 flex items-center justify-center bg-metallicVoid">
+                            <img id="reel-media-img" src="" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/90"></div>
+                        </div>
+
+                        <!-- Top Bar Overlay -->
+                        <div class="relative z-10 p-4 flex justify-between items-center text-white">
+                            <span class="font-orbitron font-bold text-xs emerald-glow-text bg-black/60 px-3 py-1 rounded-full border border-emeraldGlow/40">
+                                <i class="fa-solid fa-bolt mr-1"></i> REEL
+                            </span>
+                            <div class="text-xs text-gray-300 font-mono bg-black/50 px-2 py-1 rounded">
+                                <i class="fa-solid fa-eye text-emeraldGlow"></i> <span id="reel-views">0</span>
+                            </div>
+                        </div>
+
+                        <!-- Right Side Interactive Actions -->
+                        <div class="absolute right-4 bottom-24 z-10 flex flex-col gap-6 items-center">
+                            <button onclick="toggleReelLike()" class="flex flex-col items-center group">
+                                <div class="w-12 h-12 rounded-full bg-black/60 border border-cardBorder flex items-center justify-center text-white text-xl group-hover:border-emeraldGlow transition">
+                                    <i id="reel-like-icon" class="fa-solid fa-heart text-gray-400"></i>
+                                </div>
+                                <span id="reel-likes-count" class="text-xs font-orbitron mt-1 text-gray-200">0</span>
+                            </button>
+
+                            <button onclick="triggerReelComment()" class="flex flex-col items-center group">
+                                <div class="w-12 h-12 rounded-full bg-black/60 border border-cardBorder flex items-center justify-center text-white text-xl group-hover:border-emeraldGlow transition">
+                                    <i class="fa-solid fa-comment-dots text-emeraldGlow"></i>
+                                </div>
+                                <span id="reel-comments-count" class="text-xs font-orbitron mt-1 text-gray-200">0</span>
+                            </button>
+
+                            <button onclick="nextReel()" class="flex flex-col items-center group">
+                                <div class="w-12 h-12 rounded-full bg-emeraldDark border border-emeraldGlow flex items-center justify-center text-emeraldGlow text-xl group-hover:scale-110 transition emerald-glow-box">
+                                    <i class="fa-solid fa-arrow-down"></i>
+                                </div>
+                                <span class="text-xs font-orbitron mt-1 text-emerald-400">Next</span>
+        <!-- MOBILE HEADER -->
+        <header class="md:hidden flex items-center justify-between px-4 py-3 bg-cardBg border-b border-cardBorder z-20">
+            <div class="flex items-center gap-2" onclick="switchTab('feed')">
+                <i class="fa-solid fa-moon text-emeraldGlow text-xl"></i>
+                <h1 class="font-orbitron font-extrabold text-lg emerald-glow-text">MIDNIGHT ARC</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                                <div id="reel-avatar" class="w-10 h-10 rounded-full border-2 border-emeraldGlow bg-emeraldDark flex items-center justify-center font-bold text-emeraldGlow">
+                                    ?
+                                </div>
+                                <div>
+                                    <h4 id="reel-author" class="font-orbitron font-bold text-sm text-emeraldGlow">User</h4>
+                                </div>
+                            </div>
+                            <p id="reel-caption" class="text-xs text-gray-300 line-clamp-2 font-sans"></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4: GLOBAL BROADCAST (PUBLIC CHATROOM) -->
+            <section id="section-broadcast" class="hidden flex flex-col h-[calc(100vh-140px)] md:h-[calc(100vh-80px)] bg-cardBg border border-cardBorder rounded-2xl overflow-hidden emerald-glow-box">
+                <!-- Chat Header -->
+                <div class="p-4 bg-metallicVoid border-b border-cardBorder flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-emeraldGlow animate-ping"></div>
+                        <div>
+                            <h3 class="font-orbitron font-bold text-sm text-emeraldGlow">GLOBAL PUBLIC CHAT</h3>
+                            <p class="text-xs text-gray-400">Public messages visible to everyone.</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-mono bg-emeraldDark text-emeraldGlow px-3 py-1 rounded-full border border-emeraldGlow/40">LIVE</span>
+                </div>
+
+                <!-- Messages Feed -->
+                <div id="broadcast-messages" class="flex-1 p-4 overflow-y-auto space-y-4">
+                    <!-- Dynamic Messages Inject Here -->
+                </div>
+
+                <!-- Message Input Bar -->
+                <div class="p-3 bg-metallicVoid border-t border-cardBorder flex items-center gap-2">
+                    <input id="broadcast-input" type="text" placeholder="Type a message to broadcast..." onkeypress="handleBroadcastKey(event)" class="flex-1 bg-cardBg text-sm text-gray-200 border border-cardBorder rounded-xl px-4 py-2.5 focus:outline-none focus:border-emeraldGlow transition">
+                    <button onclick="sendBroadcast()" class="emerald-btn p-3 rounded-xl flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <!-- MOBILE BOTTOM NAVIGATION -->
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-cardBg border-t border-cardBorder px-4 py-2 flex justify-around items-center z-30">
+            <button onclick="switchTab('feed')" id="mob-feed" class="mob-btn text-emeraldGlow flex flex-col items-center gap-1">
+                <i class="fa-solid fa-newspaper text-lg"></i>
+                <span class="text-[10px] font-orbitron">Feed</span>
+            </button>
+            <button onclick="switchTab('status')" id="mob-status" class="mob-btn text-gray-400 flex flex-col items-center gap-1">
+                <i class="fa-solid fa-circle-notch text-lg"></i>
+                <span class="text-[10px] font-orbitron">Status</span>
+            </button>
+            <button onclick="switchTab('reels')" id="mob-reels" class="mob-btn text-gray-400 flex flex-col items-center gap-1">
+                <i class="fa-solid fa-clapperboard text-lg"></i>
+                <span class="text-[10px] font-orbitron">Reels</span>
+            </button>
+            <button onclick="switchTab('broadcast')" id="mob-broadcast" class="mob-btn text-gray-400 flex flex-col items-center gap-1">
+                <i class="fa-solid fa-tower-cell text-lg"></i>
+                <span class="text-[10px] font-orbitron">Broadcast</span>
+            </button>
+        </nav>
+    </main>
+
+    <!-- PROFILE MODAL -->
+    <div id="profile-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-cardBg border border-emeraldGlow rounded-2xl max-w-md w-full p-6 space-y-4">
+            <h3 class="font-orbitron text-lg font-bold text-emeraldGlow">User Setup</h3>
+            <div>
+                <label class="text-xs text-gray-400 font-orbitron block mb-1">Display Name</label>
+                <input id="profile-name-input" type="text" placeholder="e.g. Alex Mercer" class="w-full bg-metallicVoid border border-cardBorder rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-emeraldGlow">
+            </div>
+            <div>
+                <label class="text-xs text-gray-400 font-orbitron block mb-1">Username / Handle</label>
+                <input id="profile-handle-input" type="text" placeholder="e.g. @alex_reign" class="w-full bg-metallicVoid border border-cardBorder rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-emeraldGlow">
+            </div>
+            <div class="flex justify-end gap-3 pt-2">
+                <button onclick="saveProfile()" class="emerald-btn px-5 py-2 rounded-xl text-xs font-orbitron w-full">Save Identity</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATUS CREATION MODAL -->
+    <div id="status-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-cardBg border border-emeraldGlow rounded-2xl max-w-md w-full p-6 space-y-4 relative">
+            <h3 class="font-orbitron text-lg font-bold text-emeraldGlow">Add New Story / Status</h3>
+            <textarea id="status-text-input" placeholder="What's happening?" class="w-full bg-metallicVoid border border-cardBorder rounded-xl p-3 text-sm text-gray-200 focus:outline-none focus:border-emeraldGlow h-24"></textarea>
+            <input id="status-img-input" type="text" placeholder="Image URL (optional)" class="w-full bg-metallicVoid border border-cardBorder rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-emeraldGlow">
+            <div class="flex justify-end gap-3 pt-2">
+                <button onclick="closeStatusModal()" class="px-4 py-2 rounded-xl text-xs font-orbitron text-gray-400 hover:text-white">Cancel</button>
+                <button onclick="saveStatus()" class="emerald-btn px-5 py-2 rounded-xl text-xs font-orbitron">Publish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REEL CREATION MODAL -->
+    <div id="reel-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-cardBg border border-emeraldGlow rounded-2xl max-w-md w-full p-6 space-y-4 relative">
+            <h3 class="font-orbitron text-lg font-bold text-emeraldGlow">Post New Reel</h3>
+            <input id="reel-img-input" type="text" placeholder="Image URL for Reel" class="w-full bg-metallicVoid border border-cardBorder rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-emeraldGlow">
+            <textarea id="reel-caption-input" placeholder="Reel Caption..." class="w-full bg-metallicVoid border border-cardBorder rounded-xl p-3 text-sm text-gray-200 focus:outline-none focus:border-emeraldGlow h-20"></textarea>
+            <div class="flex justify-end gap-3 pt-2">
+                <button onclick="closeReelModal()" class="px-4 py-2 rounded-xl text-xs font-orbitron text-gray-400 hover:text-white">Cancel</button>
+                <button onclick="saveReel()" class="emerald-btn px-5 py-2 rounded-xl text-xs font-orbitron">Publish Reel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW STATUS MODAL -->
+    <div id="view-status-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col items-center justify-center p-4">
+        <button onclick="closeViewStatusModal()" class="absolute top-6 right-6 text-white text-2xl"><i class="fa-solid fa-xmark"></i></button>
+        <div class="max-w-md w-full bg-cardBg rounded-2xl border border-emeraldGlow/50 overflow-hidden space-y-4 p-4 text-center">
+            <div class="flex items-center gap-3 text-left mb-2">
+                <div id="status-view-avatar" class="w-10 h-10 rounded-full border border-emeraldGlow bg-emeraldDark flex items-center justify-center font-bold text-emeraldGlow"></div>
+                <div>
+                    <h4 id="status-view-author" class="font-orbitron font-bold text-sm text-emeraldGlow"></h4>
+                    <p id="status-view-time" class="text-xs text-gray-400"></p>
+                </div>
+            </div>
+            <img id="status-view-img" src="" class="w-full max-h-80 object-cover rounded-xl hidden border border-cardBorder">
+            <p id="status-view-text" class="text-lg font-orbitron text-gray-100 py-4"></p>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        // APP USER PROFILE MANAGEMENT
+        let currentUser = JSON.parse(localStorage.getItem('er_user')) || null;
+
+        let activeImageUrl = "";
+
+        // CLEAN SLATE INITIALIZATION FROM STORAGE
+        let posts = JSON.parse(localStorage.getItem('er_posts')) || [];
+        let stories = JSON.parse(localStorage.getItem('er_stories')) || [];
+        let reels = JSON.parse(localStorage.getItem('er_reels')) || [];
+        let broadcasts = JSON.parse(localStorage.getItem('er_broadcasts')) || [];
+        let currentReelIndex = 0;
+
+        window.onload = function() {
+            if (!currentUser) {
+                openProfileModal();
+            } else {
+                updateUserUI();
+            }
+            renderFeed();
+            renderStories();
+            renderReels();
+            renderBroadcasts();
+        };
+
+        function openProfileModal() {
+            if (currentUser) {
+                document.getElementById('profile-name-input').value = currentUser.name;
+                document.getElementById('profile-handle-input').value = currentUser.handle;
+            }
+            document.getElementById('profile-modal').classList.remove('hidden');
+        }
+
+        function saveProfile() {
+            const name = document.getElementById('profile-name-input').value.trim();
+            let handle = document.getElementById('profile-handle-input').value.trim();
+            if (!name) return;
+
+            if (handle && !handle.startsWith('@')) {
+                handle = '@' + handle;
+            }
+
+            const avatar = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) || 'U';
+
+            currentUser = {
+                name: name,
+                handle: handle || '@user',
+                avatar: avatar
+            };
+
+            localStorage.setItem('er_user', JSON.stringify(currentUser));
+            document.getElementById('profile-modal').classList.add('hidden');
+            updateUserUI();
+        }
+
+        function updateUserUI() {
+            if (!currentUser) return;
+            document.getElementById('sidebar-user-name').innerText = currentUser.name;
+            document.getElementById('sidebar-user-handle').innerText = currentUser.handle;
+            document.getElementById('sidebar-user-avatar').innerText = currentUser.avatar;
+            document.getElementById('create-post-avatar').innerText = currentUser.avatar;
+        }
+
+        function ensureUserSet() {
+            if (!currentUser) {
+                openProfileModal();
+                return false;
+            }
+            return true;
+        }
+
+        // TAB SWITCHER
+        function switchTab(tabId) {
+            ['feed', 'status', 'reels', 'broadcast'].forEach(id => {
+                document.getElementById(`section-${id}`).classList.add('hidden');
+            });
+            document.getElementById(`section-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-gray-400 hover:text-emeraldGlow hover:bg-emeraldDark/20 transition";
+            });
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.className = "nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl bg-emeraldDark/40 text-emeraldGlow border border-emeraldGlow/40 transition";
+            }
+
+            document.querySelectorAll('.mob-btn').forEach(btn => {
+                btn.className = "mob-btn text-gray-400 flex flex-col items-center gap-1";
+            });
+            const activeMob = document.getElementById(`mob-${tabId}`);
+            if (activeMob) {
+                activeMob.className = "mob-btn text-emeraldGlow flex flex-col items-center gap-1";
+            }
+        }
+
+        // --- POSTS & FEED LOGIC ---
+        function renderFeed() {
+            const container = document.getElementById('posts-container');
+            container.innerHTML = "";
+
+            if (posts.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-400 font-orbitron text-sm p-8 bg-cardBg border border-cardBorder rounded-2xl">
+                        No posts yet. Be the first to share something above!
+                    </div>
+                `;
+                return;
+            }
+
+            posts.forEach(post => {
+                const postEl = document.createElement('article');
+                postEl.className = "bg-cardBg border border-cardBorder rounded-2xl p-5 space-y-4 hover:border-emeraldGlow/30 transition";
+                
+                let commentsHtml = (post.comments || []).map(c => `
+                    <div class="bg-metallicVoid p-2.5 rounded-xl border border-cardBorder text-xs space-y-1">
+                        <span class="font-orbitron font-bold text-emeraldGlow">${c.author}</span>
+                        <p class="text-gray-300 font-sans">${c.text}</p>
+                    </div>
+                `).join('');
+
+                postEl.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-emeraldDark border border-emeraldGlow flex items-center justify-center font-orbitron font-bold text-emeraldGlow">
+                                ${post.avatar}
+                            </div>
+                            <div>
+                                <h4 class="font-orbitron font-bold text-sm text-gray-100 flex items-center gap-2">
+                                    ${post.author}
+                                </h4>
+                                <p class="text-xs text-gray-400 font-mono">${post.handle} • ${post.time}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-sm text-gray-200 leading-relaxed font-sans">${post.content}</p>
+                    ${post.image ? `<img src="${post.image}" class="w-full max-h-96 object-cover rounded-xl border border-cardBorder">` : ''}
+
+                    <div class="flex items-center justify-between border-t border-b border-cardBorder py-2.5 text-xs text-gray-400 font-orbitron">
+                        <div class="flex items-center gap-6">
+                            <button onclick="toggleLike('${post.id}')" class="flex items-center gap-2 hover:text-emeraldGlow transition ${post.liked ? 'text-emeraldGlow' : ''}">
+                                <i class="${post.liked ? 'fa-solid' : 'fa-regular'} fa-heart text-base"></i>
+                                <span>${post.likes || 0}</span>
+                            </button>
+                            <button onclick="toggleCommentBox('${post.id}')" class="flex items-center gap-2 hover:text-emeraldGlow transition">
+                                <i class="fa-regular fa-comment text-base"></i>
+                                <span>${(post.comments || []).length}</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-2 text-gray-400 font-mono">
+                            <i class="fa-regular fa-eye"></i>
+                            <span>${post.views || 1} views</span>
+                        </div>
+                    </div>
+
+                    <div id="comment-box-${post.id}" class="space-y-3 pt-1">
+                        <div class="space-y-2 max-h-36 overflow-y-auto pr-1">
+                            ${commentsHtml}
+                        </div>
+                        <div class="flex items-center gap-2 pt-2">
+                            <input id="input-comment-${post.id}" type="text" placeholder="Add a comment..." class="flex-1 bg-metallicVoid text-xs text-gray-200 border border-cardBorder rounded-xl px-3 py-2 focus:outline-none focus:border-emeraldGlow">
+                            <button onclick="addComment('${post.id}')" class="emerald-btn px-3 py-2 rounded-xl text-xs font-orbitron">Reply</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(postEl);
+            });
+        }
+
+        function createPost() {
+            if (!ensureUserSet()) return;
+
+            const textInput = document.getElementById('post-input-text');
+            const text = textInput.value.trim();
+            if (!text && !activeImageUrl) return;
+
+            const newPost = {
+                id: `post-${Date.now()}`,
+                author: currentUser.name,
+                handle: currentUser.handle,
+                avatar: currentUser.avatar,
+                time: "Just now",
+                content: text,
+                image: activeImageUrl,
+                likes: 0,
+                liked: false,
+                views: 1,
+                comments: []
+            };
+
+            posts.unshift(newPost);
+            localStorage.setItem('er_posts', JSON.stringify(posts));
+            textInput.value = "";
+            clearImagePreview();
+            renderFeed();
+        }
+
+        function promptImageUrl() {
+            const url = prompt("Enter Image URL for post:");
+            if (url) {
+                activeImageUrl = url;
+                document.getElementById('preview-img-tag').src = url;
+                document.getElementById('image-url-preview').classList.remove('hidden');
+            }
+        }
+
+        function clearImagePreview() {
+            activeImageUrl = "";
+            document.getElementById('image-url-preview').classList.add('hidden');
+        }
+
+        function toggleLike(postId) {
+            posts = posts.map(p => {
+                if (p.id === postId) {
+                    p.liked = !p.liked;
+                    p.likes += p.liked ? 1 : -1;
+                }
+                return p;
+            });
+            localStorage.setItem('er_posts', JSON.stringify(posts));
+            renderFeed();
+        }
+
+        function toggleCommentBox(postId) {
+            const box = document.getElementById(`comment-box-${postId}`);
+            box.classList.toggle('hidden');
+        }
+
+        function addComment(postId) {
+            if (!ensureUserSet()) return;
+            const input = document.getElementById(`input-comment-${postId}`);
+            const commentText = input.value.trim();
+            if (!commentText) return;
+
+            posts = posts.map(p => {
+                if (p.id === postId) {
+                    p.comments = p.comments || [];
+                    p.comments.push({ author: currentUser.name, text: commentText });
+                }
+                return p;
+            });
+            localStorage.setItem('er_posts', JSON.stringify(posts));
+            renderFeed();
+        }
+
+        // --- STORIES / STATUS LOGIC ---
+        function renderStories() {
+            const row = document.getElementById('stories-row');
+            const grid = document.getElementById('status-grid');
+            
+            row.innerHTML = `
+                <div onclick="openStatusModal()" class="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0">
+                    <div class="w-14 h-14 rounded-full border-2 border-dashed border-emeraldGlow flex items-center justify-center bg-emeraldDark/30 text-emeraldGlow hover:scale-105 transition">
+                        <i class="fa-solid fa-plus text-lg"></i>
+                    </div>
+                    <span class="text-xs font-medium text-emerald-400">Add Story</span>
+                </div>
+            `;
+            grid.innerHTML = "";
+
+            if (stories.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-2 text-center text-gray-400 font-orbitron text-sm p-8 bg-cardBg border border-cardBorder rounded-2xl">
+                        No Status active right now.
+                    </div>
+                `;
+                return;
+            }
+
+            stories.forEach((st, idx) => {
+                const item = document.createElement('div');
+                item.className = "flex flex-col items-center gap-1 cursor-pointer flex-shrink-0";
+                item.onclick = () => viewStatus(idx);
+                item.innerHTML = `
+                    <div class="story-ring rounded-full">
+                        <div class="w-12 h-12 rounded-full bg-cardBg border-2 border-metallicVoid flex items-center justify-center font-orbitron font-bold text-emeraldGlow text-xs">
+                            ${st.avatar}
+                        </div>
+                    </div>
+                    <span class="text-[11px] font-medium text-gray-300 truncate max-w-[60px]">${st.author.split(' ')[0]}</span>
+                `;
+                row.appendChild(item);
+
+                const card = document.createElement('div');
+                card.className = "bg-cardBg border border-cardBorder rounded-2xl p-4 flex items-center gap-4 cursor-pointer hover:border-emeraldGlow/50 transition";
+                card.onclick = () => viewStatus(idx);
+                card.innerHTML = `
+                    <div class="story-ring rounded-full flex-shrink-0">
+                        <div class="w-12 h-12 rounded-full bg-cardBg flex items-center justify-center font-orbitron font-bold text-emeraldGlow">
+                            ${st.avatar}
+                        </div>
+                    </div>
+                    <div class="overflow-hidden">
+                        <h4 class="font-orbitron font-bold text-sm text-gray-100">${st.author}</h4>
+                        <p class="text-xs text-emerald-400">${st.time}</p>
+                        <p class="text-xs text-gray-400 truncate mt-1">${st.text || 'Photo status'}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openStatusModal() {
+            if (!ensureUserSet()) return;
+            document.getElementById('status-modal').classList.remove('hidden');
+        }
+
+        function closeStatusModal() {
+            document.getElementById('status-modal').classList.add('hidden');
+        }
+
+        function saveStatus() {
+            if (!ensureUserSet()) return;
+
+            const text = document.getElementById('status-text-input').value.trim();
+            const img = document.getElementById('status-img-input').value.trim();
+            if (!text && !img) return;
+
+            stories.unshift({
+                id: `st-${Date.now()}`,
+                author: currentUser.name,
+                avatar: currentUser.avatar,
+                time: "Just now",
+                text: text,
+                image: img
+            });
+
+            localStorage.setItem('er_stories', JSON.stringify(stories));
+            document.getElementById('status-text-input').value = "";
+            document.getElementById('status-img-input').value = "";
+            closeStatusModal();
+            renderStories();
+        }
+
+        function viewStatus(index) {
+            const st = stories[index];
+            document.getElementById('status-view-author').innerText = st.author;
+            document.getElementById('status-view-avatar').innerText = st.avatar;
+            document.getElementById('status-view-time').innerText = st.time;
+            document.getElementById('status-view-text').innerText = st.text || "";
+
+            const imgTag = document.getElementById('status-view-img');
+            if (st.image) {
+                imgTag.src = st.image;
+                imgTag.classList.remove('hidden');
+            } else {
+                imgTag.classList.add('hidden');
+            }
+
+            document.getElementById('view-status-modal').classList.remove('hidden');
+        }
+
+        function closeViewStatusModal() {
+            document.getElementById('view-status-modal').classList.add('hidden');
+        }
+
+        // --- REELS LOGIC ---
+        function renderReels() {
+            const player = document.getElementById('reel-card-player');
+            const emptyMsg = document.getElementById('reel-card-empty');
+
+            if (reels.length === 0) {
+                player.classList.add('hidden');
+                emptyMsg.classList.remove('hidden');
+                return;
+            }
+
+            player.classList.remove('hidden');
+            emptyMsg.classList.add('hidden');
+            loadReel(currentReelIndex);
+        }
+
+        function loadReel(index) {
+            if (reels.length === 0) return;
+            const reel = reels[index];
+            document.getElementById('reel-media-img').src = reel.image;
+            document.getElementById('reel-author').innerText = reel.author;
+            document.getElementById('reel-avatar').innerText = reel.avatar || 'U';
+            document.getElementById('reel-caption').innerText = reel.caption;
+            document.getElementById('reel-likes-count').innerText = reel.likes || 0;
+            document.getElementById('reel-comments-count').innerText = reel.comments || 0;
+            document.getElementById('reel-views').innerText = reel.views || 1;
+
+            const likeIcon = document.getElementById('reel-like-icon');
+            likeIcon.className = reel.liked ? "fa-solid fa-heart text-emeraldGlow" : "fa-solid fa-heart text-gray-400";
+        }
+
+        function openReelModal() {
+            if (!ensureUserSet()) return;
+            document.getElementById('reel-modal').classList.remove('hidden');
+        }
+
+        function closeReelModal() {
+            document.getElementById('reel-modal').classList.add('hidden');
+        }
+
+        function saveReel() {
+            if (!ensureUserSet()) return;
+
+            const img = document.getElementById('reel-img-input').value.trim();
+            const caption = document.getElementById('reel-caption-input').value.trim();
+
+            if (!img) {
+                alert("Please provide an Image URL for the reel!");
+                return;
+            }
+
+            reels.unshift({
+                author: currentUser.name,
+                avatar: currentUser.avatar,
+                caption: caption,
+                likes: 0,
+                liked: false,
+                comments: 0,
+                views: 1,
+                image: img
+            });
+
+            localStorage.setItem('er_reels', JSON.stringify(reels));
+            document.getElementById('reel-img-input').value = "";
+            document.getElementById('reel-caption-input').value = "";
+            closeReelModal();
+            currentReelIndex = 0;
+            renderReels();
+        }
+
+        function nextReel() {
+            if (reels.length === 0) return;
+            currentReelIndex = (currentReelIndex + 1) % reels.length;
+            reels[currentReelIndex].views = (reels[currentReelIndex].views || 0) + 1;
+            localStorage.setItem('er_reels', JSON.stringify(reels));
+            loadReel(currentReelIndex);
+        }
+
+        function toggleReelLike() {
+            if (reels.length === 0) return;
+            const reel = reels[currentReelIndex];
+            reel.liked = !reel.liked;
+            reel.likes += reel.liked ? 1 : -1;
+            localStorage.setItem('er_reels', JSON.stringify(reels));
+            loadReel(currentReelIndex);
+        }
+
+        function triggerReelComment() {
+            if (reels.length === 0) return;
+            const comment = prompt("Add comment to this Reel:");
+            if (comment) {
+                reels[currentReelIndex].comments += 1;
+                localStorage.setItem('er_reels', JSON.stringify(reels));
+                loadReel(currentReelIndex);
+            }
+        }
+
+        // --- GLOBAL BROADCAST LOGIC ---
+        function renderBroadcasts() {
+            const container = document.getElementById('broadcast-messages');
+            container.innerHTML = "";
+
+            if (broadcasts.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-xs font-mono text-emerald-400 bg-emeraldDark/20 border border-emeraldGlow/30 rounded-lg p-3 my-2">
+                        Global Chat is online. Be the first to send a message!
+                    </div>
+                `;
+                return;
+            }
+
+            broadcasts.forEach(b => {
+                const msgDiv = document.createElement('div');
+                const isSelf = currentUser && b.author === currentUser.name;
+                msgDiv.className = `flex flex-col ${isSelf ? 'items-end' : 'items-start'} space-y-1`;
+                msgDiv.innerHTML = `
+                    <span class="text-[10px] font-orbitron text-gray-400">${b.author} • ${b.time}</span>
+                    <div class="${isSelf ? 'bg-emeraldDark border border-emeraldGlow text-white' : 'bg-metallicVoid border border-cardBorder text-gray-200'} rounded-2xl px-4 py-2.5 text-xs max-w-[80%] font-sans">
+                        ${b.text}
+                    </div>
+                `;
+                container.appendChild(msgDiv);
+            });
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendBroadcast() {
+            if (!ensureUserSet()) return;
+
+            const input = document.getElementById('broadcast-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            broadcasts.push({
+                author: currentUser.name,
+                text: text,
+                time: timeStr
+            });
+
+            localStorage.setItem('er_broadcasts', JSON.stringify(broadcasts));
+            input.value = "";
+            renderBroadcasts();
+        }
+
+        function handleBroadcastKey(e) {
+            if (e.key === 'Enter') {
+                sendBroadcast();
+            }
+        }
+    </script>
+</body>
+</html>
